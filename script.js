@@ -1,119 +1,73 @@
-document.getElementById('scriptFile').addEventListener('change', function(event) {
-  const file = event.target.files[0];
+document.addEventListener("DOMContentLoaded", () => {
+    const uploadForm = document.getElementById("upload-form");
+    const fileInput = document.getElementById("file-input");
+    const analysisResults = document.getElementById("analysis-results");
 
-  if (file) {
-    const reader = new FileReader();
+    uploadForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-    reader.onload = async function(e) {
-      const scriptText = e.target.result;
-      const analysisResult = analyzePythonCode(scriptText);
-      displayAnalysisResult(analysisResult);
-    };
+        const file = fileInput.files[0];
+        if (!file) {
+            alert("Please select a Python script file.");
+            return;
+        }
 
-    reader.readAsText(file);
-  }
-});
+        const fileContent = await readFile(file);
+        const analysis = analyzeScript(fileContent);
 
-function analyzePythonCode(scriptText) {
-  const analysisResult = {
-    variables: [],
-    functions: [],
-    dictionaries: [],
-    tuples: [],
-    lists: [],
-    imports: []
-  };
+        displayAnalysisResults(analysis);
+    });
 
-  const lines = scriptText.split('\n');
-
-  lines.forEach(line => {
-    const trimmedLine = line.trim();
-
-    if (trimmedLine.startsWith('import ') || trimmedLine.startsWith('from ')) {
-      const importMatch = line.match(/(?:import|from)\s+([^\s]+)/);
-      if (importMatch) {
-        const importName = importMatch[1];
-        analysisResult.imports.push(importName);
-      }
-    } else if (trimmedLine.startsWith('def ')) {
-      const functionName = line.match(/def\s+(\w+)\s*\(/);
-      if (functionName) {
-        analysisResult.functions.push(functionName[1]);
-      }
-    } else if (trimmedLine.startsWith('class ')) {
-      const className = line.match(/class\s+(\w+)/);
-      if (className) {
-        analysisResult.classes.push(className[1]);
-      }
-    } else if (trimmedLine.includes('=')) {
-      const variableName = line.match(/(\w+)\s*=/);
-      if (variableName) {
-        analysisResult.variables.push(variableName[1]);
-      }
-    } else if (trimmedLine.includes('{')) {
-      if (trimmedLine.includes(':')) {
-        analysisResult.dictionaries.push(trimmedLine);
-      } else {
-        analysisResult.tuples.push(trimmedLine);
-      }
-    } else if (trimmedLine.includes('[')) {
-      analysisResult.lists.push(trimmedLine);
+    async function readFile(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => resolve(event.target.result);
+            reader.onerror = (event) => reject(event.target.error);
+            reader.readAsText(file);
+        });
     }
-  });
 
-  return analysisResult;
-}
+    function analyzeScript(scriptContent) {
+        const lines = scriptContent.split("\n");
+        const analysis = {
+            imports: [],
+            variables: [],
+            functions: [],
+            comments: [],
+            controlStructures: [],
+            inputs: [],
+            // ...other categories...
+        };
 
-function displayAnalysisResult(analysisResult) {
-  const outputElement = document.getElementById('output');
-  const output = generateOutput(analysisResult);
-  outputElement.textContent = output;
-}
+        for (const line of lines) {
+            if (line.trim().startsWith("import")) {
+                analysis.imports.push(line);
+            } else if (line.trim().startsWith("def ")) {
+                analysis.functions.push(line);
+            } else if (line.trim().startsWith("#")) {
+                analysis.comments.push(line);
+            } else if (line.includes("=")) {
+                analysis.variables.push(line);
+            }
+            // Add more checks for other categories...
+        }
 
-function generateOutput(analysisResult) {
-  let output = '';
+        return analysis;
+    }
 
-  if (analysisResult.variables.length > 0) {
-    output += `Variables: ${analysisResult.variables.join(', ')}\n`;
-  } else {
-    output += 'No variables found.\n';
-  }
-
-  if (analysisResult.functions.length > 0) {
-    output += `Functions: ${analysisResult.functions.join(', ')}\n`;
-  } else {
-    output += 'No functions found.\n';
-  }
-
-  if (analysisResult.classes.length > 0) {
-    output += `Classes: ${analysisResult.classes.join(', ')}\n`;
-  } else {
-    output += 'No classes found.\n';
-  }
-
-  if (analysisResult.imports.length > 0) {
-    output += `Imports: ${analysisResult.imports.join(', ')}\n`;
-  } else {
-    output += 'No imports found.\n';
-  }
-
-  if (analysisResult.dictionaries.length > 0) {
-    output += `Dictionaries:\n${analysisResult.dictionaries.join('\n')}\n`;
-  } else {
-    output += 'No dictionaries found.\n';
-  }
-
-  if (analysisResult.tuples.length > 0) {
-    output += `Tuples:\n${analysisResult.tuples.join('\n')}\n`;
-  } else {
-    output += 'No tuples found.\n';
-  }
-
-  if (analysisResult.lists.length > 0) {
-    output += `Lists:\n${analysisResult.lists.join('\n')}\n`;
-  } else {
-    output += 'No lists found.\n';
-  }
-
-  return output;
-}
+    function displayAnalysisResults(analysis) {
+        const resultsHTML = `
+            <h2>Analysis Results</h2>
+            <h3>Imports:</h3>
+            <pre>${analysis.imports.join("\n")}</pre>
+            <h3>Variables:</h3>
+            <pre>${analysis.variables.join("\n")}</pre>
+            <h3>Functions:</h3>
+            <pre>${analysis.functions.join("\n")}</pre>
+            <h3>Comments:</h3>
+            <pre>${analysis.comments.join("\n")}</pre>
+            <!-- ...other categories... -->
+        `;
+        analysisResults.innerHTML = resultsHTML;
+    }
+});
