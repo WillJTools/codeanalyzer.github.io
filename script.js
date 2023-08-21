@@ -40,8 +40,11 @@ document.addEventListener("DOMContentLoaded", () => {
             // ...other categories...
         };
         
-        let insideFunction = false;
+        let insideIfBlock = false;
+        let insideTryBlock = false;
         let insideMainExecution = false;
+        let insideFunction = false;
+        let currentBlock = [];
         
         for (const line of lines) {
             if (line.trim().startsWith("import")) {
@@ -55,14 +58,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 analysis.comments.push(line);
             } else if (line.includes("=")) {
                 analysis.variables.push(line);
+            } else if (line.trim().startsWith("if ")) {
+                insideIfBlock = true;
+            } else if (insideIfBlock || insideTryBlock || insideMainExecution) {
+                currentBlock.push(line);
+            } else if (line.includes(":")) {
+                if (insideIfBlock) {
+                    analysis.controlStructures.push(currentBlock.join("\n"));
+                    insideIfBlock = false;
+                } else if (insideTryBlock) {
+                    analysis.errorHandling.push(currentBlock.join("\n"));
+                    insideTryBlock = false;
+                } else if (insideMainExecution) {
+                    analysis.mainExecution.push(currentBlock.join("\n"));
+                    insideMainExecution = false;
+                }
+                currentBlock = [];
+            } else if (line.trim().startsWith("try:")) {
+                insideTryBlock = true;
             } else if (line.trim() === "if __name__ == '__main__':") {
                 insideMainExecution = true;
-            } else if (insideMainExecution) {
-                analysis.mainExecution.push(line);
-            } else if (line.trim().startsWith("try:")) {
-                analysis.errorHandling.push(line);
             }
-            // Add more checks for control structures...
         }
         
         return analysis;
