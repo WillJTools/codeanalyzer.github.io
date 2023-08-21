@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <pre>${analysis.errorHandling.join("\n")}</pre>
             <h3>Main Execution:</h3>
             <pre>${analysis.mainExecution.join("\n")}</pre>
-            <!-- ...other categories... -->
+            <!-- ...maybe I will add more -->
         `;
         analysisResults.innerHTML = resultsHTML;
     }
