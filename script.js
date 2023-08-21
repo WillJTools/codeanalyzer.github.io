@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const file = fileInput.files[0];
         if (!file) {
-            alert("Please select a Python script file.");
+            alert("Please select a file.");
             return;
         }
 
@@ -35,23 +35,36 @@ document.addEventListener("DOMContentLoaded", () => {
             functions: [],
             comments: [],
             controlStructures: [],
-            inputs: [],
+            errorHandling: [],
+            mainExecution: [],
             // ...other categories...
         };
-
+        
+        let insideFunction = false;
+        let insideMainExecution = false;
+        
         for (const line of lines) {
             if (line.trim().startsWith("import")) {
                 analysis.imports.push(line);
             } else if (line.trim().startsWith("def ")) {
                 analysis.functions.push(line);
+                insideFunction = true;
+            } else if (insideFunction && line.includes(":")) {
+                insideFunction = false;
             } else if (line.trim().startsWith("#")) {
                 analysis.comments.push(line);
             } else if (line.includes("=")) {
                 analysis.variables.push(line);
+            } else if (line.trim() === "if __name__ == '__main__':") {
+                insideMainExecution = true;
+            } else if (insideMainExecution) {
+                analysis.mainExecution.push(line);
+            } else if (line.trim().startsWith("try:")) {
+                analysis.errorHandling.push(line);
             }
-            // Add more checks for other categories...
+            // Add more checks for control structures...
         }
-
+        
         return analysis;
     }
 
@@ -66,6 +79,12 @@ document.addEventListener("DOMContentLoaded", () => {
             <pre>${analysis.functions.join("\n")}</pre>
             <h3>Comments:</h3>
             <pre>${analysis.comments.join("\n")}</pre>
+            <h3>Control Structures:</h3>
+            <pre>${analysis.controlStructures.join("\n")}</pre>
+            <h3>Error Handling:</h3>
+            <pre>${analysis.errorHandling.join("\n")}</pre>
+            <h3>Main Execution:</h3>
+            <pre>${analysis.mainExecution.join("\n")}</pre>
             <!-- ...other categories... -->
         `;
         analysisResults.innerHTML = resultsHTML;
