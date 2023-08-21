@@ -39,48 +39,48 @@ document.addEventListener("DOMContentLoaded", () => {
             mainExecution: [],
             // ...other categories...
         };
-        
-        let insideIfBlock = false;
-        let insideTryBlock = false;
-        let insideMainExecution = false;
+
         let insideFunction = false;
-        let currentBlock = [];
-        
+        let insideMainExecution = false;
+        let insideTryBlock = false;
+        let insideIfBlock = false;
+
         for (const line of lines) {
             if (line.trim().startsWith("import")) {
                 analysis.imports.push(line);
             } else if (line.trim().startsWith("def ")) {
-                analysis.functions.push(line);
                 insideFunction = true;
+                analysis.functions.push(line);
             } else if (insideFunction && line.includes(":")) {
                 insideFunction = false;
             } else if (line.trim().startsWith("#")) {
                 analysis.comments.push(line);
             } else if (line.includes("=")) {
                 analysis.variables.push(line);
-            } else if (line.trim().startsWith("if ")) {
-                insideIfBlock = true;
-            } else if (insideIfBlock || insideTryBlock || insideMainExecution) {
-                currentBlock.push(line);
-            } else if (line.includes(":")) {
-                if (insideIfBlock) {
-                    analysis.controlStructures.push(currentBlock.join("\n"));
-                    insideIfBlock = false;
-                } else if (insideTryBlock) {
-                    analysis.errorHandling.push(currentBlock.join("\n"));
-                    insideTryBlock = false;
-                } else if (insideMainExecution) {
-                    analysis.mainExecution.push(currentBlock.join("\n"));
-                    insideMainExecution = false;
-                }
-                currentBlock = [];
-            } else if (line.trim().startsWith("try:")) {
-                insideTryBlock = true;
             } else if (line.trim() === "if __name__ == '__main__':") {
                 insideMainExecution = true;
+                analysis.mainExecution.push(line);
+            } else if (insideMainExecution && line.trim() === "else:"){
+                insideMainExecution = false;
+            } else if (line.trim().startsWith("if ") || line.trim().startsWith("elif ") || line.trim().startsWith("else:")) {
+                insideIfBlock = true;
+                analysis.controlStructures.push(line);
+            } else if (insideIfBlock) {
+                analysis.controlStructures.push(line);
+                if (line.trim().endsWith(":")) {
+                    insideIfBlock = false;
+                }
+            } else if (line.trim().startsWith("try:")) {
+                insideTryBlock = true;
+                analysis.errorHandling.push(line);
+            } else if (insideTryBlock) {
+                analysis.errorHandling.push(line);
+                if (line.trim().startsWith("except") || line.trim().startsWith("finally:")) {
+                    insideTryBlock = false;
+                }
             }
         }
-        
+
         return analysis;
     }
 
@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <pre>${analysis.errorHandling.join("\n")}</pre>
             <h3>Main Execution:</h3>
             <pre>${analysis.mainExecution.join("\n")}</pre>
-            <!-- ...maybe I will add more -->
+            <!-- ...other categories... -->
         `;
         analysisResults.innerHTML = resultsHTML;
     }
