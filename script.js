@@ -37,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
             controlStructures: [],
             errorHandling: [],
             mainExecution: [],
-            // ...other categories...
         };
 
         let insideFunction = false;
@@ -101,7 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
             <pre>${analysis.errorHandling.join("\n")}</pre>
             <h3>Main Execution:</h3>
             <pre>${analysis.mainExecution.join("\n")}</pre>
-            <!-- ...other categories... -->
         `;
         analysisResults.innerHTML = resultsHTML;
     }
