@@ -15,16 +15,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const fileContent = await readFile(file);
         const fileExtension = getFileExtension(file.name);
 
-        let analysis;
-        if (fileExtension === 'js') {
-            analysis = analyzeJavaScript(fileContent);
-        } else if (fileExtension === 'py') {
-            analysis = analyzePython(fileContent);
-        } else {
-            alert("Unsupported file type. Please upload a .py or .js file.");
+        if (fileExtension !== 'js') {
+            alert("Unsupported file type. Please upload a .js file.");
             return;
         }
 
+        const analysis = analyzeJavaScript(fileContent);
         displayAnalysisResults(analysis);
     });
 
@@ -41,20 +37,18 @@ document.addEventListener("DOMContentLoaded", () => {
         return fileName.split('.').pop().toLowerCase();
     }
 
-    function analyzePython(scriptContent) {
-        // ... Python analysis logic (as previously implemented) ...
-        return { /* Python analysis result */ };
-    }
-
     function analyzeJavaScript(scriptContent) {
-        // ... JavaScript analysis logic (similar to Python analysis) ...
-        return { /* JavaScript analysis result */ };
+        // JavaScript analysis logic
+        // Implement your analysis logic for JavaScript here
+        // This function should return an object with analysis results
+        return { /* Analysis results for JavaScript */ };
     }
 
     function displayAnalysisResults(analysis) {
-        // ... Display analysis results (as previously implemented) ...
+        // Display analysis results
+        // Implement the rendering of JavaScript analysis results here
         const resultsHTML = `
-            <!-- Updated results based on the analysis of Python or JavaScript -->
+            <!-- Display JavaScript analysis results -->
         `;
         analysisResults.innerHTML = resultsHTML;
     }
