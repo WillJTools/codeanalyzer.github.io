@@ -13,9 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const fileContent = await readFile(file);
-        const functions = extractFunctions(fileContent);
+        const { functions, globalVariables } = extractScriptInfo(fileContent);
 
-        displayAnalysisResults(functions);
+        displayAnalysisResults(functions, globalVariables);
     });
 
     async function readFile(file) {
@@ -27,17 +27,24 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function extractFunctions(scriptContent) {
+    function extractScriptInfo(scriptContent) {
         const functionRegex = /function\s+([^\s(]+)/g;
         const matches = scriptContent.matchAll(functionRegex);
         const functions = Array.from(matches, match => match[1]);
-        return functions;
+
+        const variableRegex = /(?:var|let|const)\s+([^\s;=]+)/g;
+        const variableMatches = scriptContent.matchAll(variableRegex);
+        const variables = Array.from(variableMatches, match => match[1]);
+
+        return { functions, globalVariables: variables };
     }
 
-    function displayAnalysisResults(functions) {
+    function displayAnalysisResults(functions, globalVariables) {
         const resultsHTML = `
             <h2>Extracted Functions</h2>
             <pre>${functions.join("\n")}</pre>
+            <h2>Global Variables</h2>
+            <pre>${globalVariables.join("\n")}</pre>
         `;
         analysisResults.innerHTML = resultsHTML;
     }
