@@ -44,7 +44,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function displayAnalysisResults(functions, globalVariables, comments) {
+        const overallAnalysis = generateOverallAnalysis(functions, globalVariables, comments);
+
         const resultsHTML = `
+            <h2>Overall Analysis</h2>
+            <pre>${overallAnalysis}</pre>
             <h2>Extracted Functions</h2>
             <pre>${functions.join("\n")}</pre>
             <h2>Global Variables</h2>
@@ -53,5 +57,17 @@ document.addEventListener("DOMContentLoaded", () => {
             <pre>${comments.join("\n")}</pre>
         `;
         analysisResults.innerHTML = resultsHTML;
+    }
+
+    function generateOverallAnalysis(functions, globalVariables, comments) {
+        const totalFunctions = functions.length;
+        const totalVariables = globalVariables.length;
+        const totalComments = comments.length;
+
+        return `
+            Total Functions: ${totalFunctions}
+            Total Global Variables: ${totalVariables}
+            Total Comments: ${totalComments}
+        `;
     }
 });
