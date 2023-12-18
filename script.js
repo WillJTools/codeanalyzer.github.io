@@ -12,15 +12,24 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        console.log("File selected:", file);
+
         const fileContent = await readFile(file);
+        console.log("File content:", fileContent);
+
         const fileExtension = getFileExtension(file.name);
+        console.log("File extension:", fileExtension);
 
         if (fileExtension !== 'js') {
             alert("Unsupported file type. Please upload a .js file.");
             return;
         }
 
+        console.log("Starting JavaScript analysis...");
+
         const analysis = analyzeJavaScript(fileContent);
+        console.log("Analysis results:", analysis);
+
         displayAnalysisResults(analysis);
     });
 
@@ -38,18 +47,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function analyzeJavaScript(scriptContent) {
-        // JavaScript analysis logic
-        // Implement your analysis logic for JavaScript here
-        // This function should return an object with analysis results
-        return { /* Analysis results for JavaScript */ };
-    }
-
-    function displayAnalysisResults(analysis) {
-        // Display analysis results
-        // Implement the rendering of JavaScript analysis results here
-        const resultsHTML = `
-            <!-- Display JavaScript analysis results -->
-        `;
-        analysisResults.innerHTML = resultsHTML;
-    }
-});
