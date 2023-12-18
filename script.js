@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const matches = scriptContent.matchAll(functionRegex);
         const functions = Array.from(matches, match => match[1]);
 
-        const variableRegex = /(?:var|let|const)\s+([^\s;=]+)/g;
+        const variableRegex = /(?:const|let|var)\s+(\w+)\s*=/g;
         const variableMatches = scriptContent.matchAll(variableRegex);
         const variables = Array.from(variableMatches, match => match[1]);
 
