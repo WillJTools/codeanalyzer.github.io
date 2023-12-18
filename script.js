@@ -12,25 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        console.log("File selected:", file);
-
         const fileContent = await readFile(file);
-        console.log("File content:", fileContent);
+        const functions = extractFunctions(fileContent);
 
-        const fileExtension = getFileExtension(file.name);
-        console.log("File extension:", fileExtension);
-
-        if (fileExtension !== 'js') {
-            alert("Unsupported file type. Please upload a .js file.");
-            return;
-        }
-
-        console.log("Starting JavaScript analysis...");
-
-        const analysis = analyzeJavaScript(fileContent);
-        console.log("Analysis results:", analysis);
-
-        displayAnalysisResults(analysis);
+        displayAnalysisResults(functions);
     });
 
     async function readFile(file) {
@@ -42,8 +27,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function getFileExtension(fileName) {
-        return fileName.split('.').pop().toLowerCase();
+    function extractFunctions(scriptContent) {
+        const functionRegex = /function\s+([^\s(]+)/g;
+        const matches = scriptContent.matchAll(functionRegex);
+        const functions = Array.from(matches, match => match[1]);
+        return functions;
     }
 
-    function analyzeJavaScript(scriptContent) {
+    function displayAnalysisResults(functions) {
+        const resultsHTML = `
+            <h2>Extracted Functions</h2>
+            <pre>${functions.join("\n")}</pre>
+        `;
+        analysisResults.innerHTML = resultsHTML;
+    }
+});
